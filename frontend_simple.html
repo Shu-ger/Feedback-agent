@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <title>Feedback Agent — Demo</title>
+  <style>
+    /* General page styling */
+    body {
+      font-family: "Arial", sans-serif;
+      background-color: #f5f7fa;
+      margin: 0;
+      padding: 0;
+      direction: rtl;
+      text-align: right;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+
+    /* Container for content */
+    .container {
+      background-color: #ffffff;
+      margin-top: 50px;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      width: 500px;
+    }
+
+    h2 {
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      direction: rtl;
+      text-align: right;
+      resize: vertical;
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      font-size: 16px;
+      color: #fff;
+      background-color: #007bff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    pre {
+      background-color: #f0f0f0;
+      padding: 15px;
+      border-radius: 5px;
+      margin-top: 20px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      max-height: 200px;
+      overflow-y: auto;
+      direction: rtl;
+      text-align: right;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Feedback Agent</h2>
+    <h2>איך אוכל לעזור היום?</h2>
+
+    <textarea id="q" rows="3">מה הבעיה העיקרית במשובים עם ציון נמוך?</textarea><br>
+    <button id="send">שלח</button>
+
+    <pre id="out"></pre>
+  </div>
+
+  <script>
+    const sendButton = document.getElementById('send');
+    const output = document.getElementById('out');
+    const textarea = document.getElementById('q');
+    sendButton.addEventListener('click', async () => {
+  const question = textarea.value.trim();
+
+  if (!question) {
+    output.textContent = "נא להזין שאלה קודם 🙂";
+    return;
+  }
+
+  output.textContent = "שולח את השאלה לשרת...";
+
+  try {
+    // Save the response in a variable
+    const response = await fetch("http://127.0.0.1:8000/ask", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ question: question })
+    });
+
+    if (!response.ok) {
+      throw new Error("Server error: " + response.status);
+    }
+
+    // Parse JSON from the response
+    const data = await response.json();
+
+    // Display the answer
+    output.textContent = data.answer || "אין תשובה מהשרת.";
+  } catch (error) {
+    console.error(error);
+    output.textContent = "שגיאה בשליחה לשרת: " + error.message;
+  }
+});
+
+//     sendButton.addEventListener('click', async () => {
+//   const question = textarea.value.trim();
+
+//   if (!question) {
+//     output.textContent = "נא להזין שאלה קודם 🙂";
+//     return;
+//   }
+
+//   output.textContent = "שולח את השאלה לשרת...";
+
+//   try {
+//    await fetch("http://127.0.0.1:8000/ask", {
+//   method: "POST",
+//   headers: {
+//     "Content-Type": "application/json"
+//   },
+//   body: JSON.stringify({ question: question })
+// });
+//     if (!response.ok) {
+//       throw new Error("Server error: " + response.status);
+//     }
+
+//     const data = await response.json();
+//     output.textContent = data.answer || "אין תשובה מהשרת.";
+//   } catch (error) {
+//     console.error(error);
+//     output.textContent = "שגיאה בשליחה לשרת: " + error.message;
+//   }
+// });
+
+  </script>
+</body>
+</html>
